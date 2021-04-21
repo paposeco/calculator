@@ -68,6 +68,7 @@ para2.textContent = "0";
 
 //para.textContent = "0";
 
+let isoperator = false;
 // event handlers
 function getOperator(event, typeofInput) {
   if (operator != "" && secondNumber === "") {
@@ -96,7 +97,7 @@ function getOperator(event, typeofInput) {
   }
 
   firstNumber = Number(firstNumber);
-
+  isoperator = true;
   switch (operator) {
     case "add":
     case "NumpadAdd":
@@ -173,7 +174,24 @@ function backspaceCalc(event) {
   if (total != "") {
     return;
   }
-  if (typeof firstNumber === "string") {
+  if (isoperator === true) {
+    operator = "";
+    isoperator = false;
+    if (firstNumber === "") {
+      para2.textContent = "0";
+      para.textContent = "\u00a0";
+    } else {
+      let textContentBeforeOperatorDeletion = para.textContent;
+      /* para.textContent = ""; */
+      para.textContent = textContentBeforeOperatorDeletion.slice(
+        0,
+        textContentBeforeOperatorDeletion.length - 2
+      );
+      stop = true;
+      return;
+    }
+  }
+  if (typeof firstNumber === "string" && operator != "") {
     let newFirstNumber = firstNumber.slice(0, firstNumber.length - 1);
     firstNumber = newFirstNumber;
     if (firstNumber === "") {
@@ -185,7 +203,7 @@ function backspaceCalc(event) {
     }
     para.textContent = firstNumber;
     para2.textContent = firstNumber;
-  } else if (typeof secondNumber === "string") {
+  } else if (typeof secondNumber === "string" && operator != "") {
     let textContentBeforeDeletion = para.textContent;
     let textContentBeforeDeletionInput = para2.textContent;
     let newSecondNumber = secondNumber.slice(0, secondNumber.length - 1);
@@ -326,6 +344,7 @@ window.addEventListener("keydown", function (event) {
   }
   let digitKeyCodes = [96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 110];
   if (digitKeyCodes.includes(event.keyCode)) {
+    isoperator = false;
     if (operator === "") {
       if (firstNumber === "0" && event.code === "Numpad0") {
         return;
@@ -380,4 +399,4 @@ window.addEventListener("keydown", function (event) {
 
 // o menos deve funcionar depois de qualquer operador
 // focus no keyboard on enter fucks it up
-//apagar operador
+// os 0 nao estao a funcionar. quando meto o ., apaga o zero
