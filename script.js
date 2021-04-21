@@ -49,6 +49,7 @@ const buttonOne = document.getElementById("one");
 const display = document.getElementById("displayInput");
 const equals = document.getElementById("equals");
 const clear = document.getElementById("clear");
+const operatorsAll = document.querySelectorAll("#operators button");
 const operators = document.getElementById("operators");
 const para = document.getElementById("equation");
 const para2 = document.getElementById("currentInput");
@@ -63,9 +64,9 @@ let total = "";
 let subtotal = "";
 let dot = false;
 let currentTextContent;
+para2.textContent = "0";
 
 //para.textContent = "0";
-para2.textContent = "0";
 
 // event handlers
 function getOperator(event, typeofInput) {
@@ -95,41 +96,46 @@ function getOperator(event, typeofInput) {
   }
 
   firstNumber = Number(firstNumber);
-  if (typeofInput === "mouse") {
-    switch (operator) {
-      case "add":
+
+  switch (operator) {
+    case "add":
+    case "NumpadAdd":
+      if (firstNumber === 0 && subtotal === "") {
+        para.textContent += "0 + ";
+      } else {
         para.textContent += " + ";
-        break;
-      case "subtract":
+      }
+      operator = "add";
+      break;
+    case "subtract":
+    case "NumpadSubtract":
+      if (firstNumber === 0 && subtotal === "") {
+        para.textContent += "0 - ";
+      } else {
         para.textContent += " - ";
-        break;
-      case "multiply":
+      }
+      operator = "subtract";
+      break;
+    case "multiply":
+    case "NumpadMultiply":
+      if (firstNumber === 0 && subtotal === "") {
+        para.textContent += "0 x ";
+      } else {
         para.textContent += " x ";
-        break;
-      case "divide":
-        para.textContent += " / ";
-        break;
-    }
-  } else {
-    switch (operator) {
-      case "NumpadAdd":
-        operator = "add";
-        para.textContent += " + ";
-        break;
-      case "NumpadSubtract":
-        para.textContent += " - ";
-        operator = "subtract";
-        break;
-      case "NumpadMultiply":
-        para.textContent += " x ";
-        operator = "multiply";
-        break;
-      case "NumpadDivide":
-        para.textContent += " / ";
-        operator = "divide";
-        break;
-    }
+      }
+      operator = "multiply";
+      break;
+    case "divide":
+    case "NumpadDivide":
+      if (firstNumber === 0 && subtotal === "") {
+        para.textContent += "0 \u00F7 ";
+      } else {
+        para.textContent += " \u00F7 ";
+      }
+      operator = "divide";
+      break;
   }
+
   currentTextContent = para.textContent;
   dot = false;
 }
@@ -137,13 +143,18 @@ function getOperator(event, typeofInput) {
 function getEquals(event) {
   if (firstNumber === "" && secondNumber === "") {
     return;
-  } else if (secondNumber === "") {
-    total = firstNumber;
-    para.textContent += "=";
+  }
+  if (secondNumber === "") {
+    secondNumber = firstNumber;
+    let a = Number(firstNumber);
+    let b = Number(secondNumber);
+    total = operate(operator, a, b);
+    para.textContent += secondNumber + " = " + total;
     para2.textContent = total;
     subtotal = total;
     operator = "";
     firstNumber = "";
+    secondNumber = "";
   } else {
     let a = Number(firstNumber);
     let b = Number(secondNumber);
@@ -158,21 +169,50 @@ function getEquals(event) {
 }
 
 function backspaceCalc(event) {
+  let stop = false;
   if (total != "") {
     return;
   }
   if (typeof firstNumber === "string") {
     let newFirstNumber = firstNumber.slice(0, firstNumber.length - 1);
     firstNumber = newFirstNumber;
+    if (firstNumber === "") {
+      firstNumber = "";
+      para2.textContent = "0";
+      para.textContent = "\u00a0";
+      stop = true;
+      return;
+    }
     para.textContent = firstNumber;
+    para2.textContent = firstNumber;
   } else if (typeof secondNumber === "string") {
     let textContentBeforeDeletion = para.textContent;
+    let textContentBeforeDeletionInput = para2.textContent;
     let newSecondNumber = secondNumber.slice(0, secondNumber.length - 1);
+
     secondNumber = newSecondNumber;
-    para.textContent = textContentBeforeDeletion.slice(
-      0,
-      textContentBeforeDeletion.length - 1
-    );
+
+    if (secondNumber === "") {
+      secondNumber = "0";
+      para2.textContent = "0";
+      para.textContent = textContentBeforeDeletion.slice(
+        0,
+        textContentBeforeDeletion.length - 1
+      );
+      para.textContent += "0";
+      stop = true;
+      return;
+    }
+    if (!stop) {
+      para.textContent = textContentBeforeDeletion.slice(
+        0,
+        textContentBeforeDeletion.length - 1
+      );
+      para2.textContent = textContentBeforeDeletionInput.slice(
+        0,
+        textContentBeforeDeletionInput.length - 1
+      );
+    }
   } else return;
 }
 
@@ -211,8 +251,13 @@ digitsAll.forEach((element) =>
       } else if (firstNumber === "" && event.target.name === "dot") {
         firstNumber = "0.";
       } else {
-        firstNumber += event.target.value;
-        if (limitInput(firstNumber)) return;
+        if (firstNumber[0] === "0" && event.target.value !== "dot") {
+          firstNumber = "";
+          firstNumber += event.target.value;
+        } else {
+          firstNumber += event.target.value;
+          if (limitInput(firstNumber)) return;
+        }
       }
       subtotal = "";
       para.textContent = "";
@@ -227,8 +272,13 @@ digitsAll.forEach((element) =>
       } else if (secondNumber === "" && event.target.name === "dot") {
         secondNumber = "0.";
       } else {
-        secondNumber += event.target.value;
-        if (limitInput(secondNumber)) return;
+        if (secondNumber[0] === "0" && event.target.value !== "dot") {
+          secondNumber = "";
+          secondNumber += event.target.value;
+        } else {
+          secondNumber += event.target.value;
+          if (limitInput(secondNumber)) return;
+        }
       }
 
       para.textContent = currentTextContent + secondNumber;
@@ -241,9 +291,11 @@ digitsAll.forEach((element) =>
 equals.addEventListener("click", getEquals);
 clear.addEventListener("click", clearCalc);
 backspace.addEventListener("click", backspaceCalc);
-operators.addEventListener("click", function () {
-  getOperator(event, "mouse");
-});
+operatorsAll.forEach((element) =>
+  element.addEventListener("click", function () {
+    getOperator(event, "mouse");
+  })
+);
 
 // keyboard
 window.addEventListener("keydown", function (event) {
@@ -283,8 +335,13 @@ window.addEventListener("keydown", function (event) {
         if (event.code === "NumpadDecimal") {
           firstNumber += ".";
         } else {
-          firstNumber += event.code.slice(6);
-          if (limitInput(firstNumber)) return;
+          if (firstNumber[0] === "0" && event.code !== "NumpadDecimal") {
+            firstNumber = "";
+            firstNumber += event.code.slice(6);
+          } else {
+            firstNumber += event.code.slice(6);
+            if (limitInput(firstNumber)) return;
+          }
         }
       }
       subtotal = "";
@@ -303,8 +360,13 @@ window.addEventListener("keydown", function (event) {
         if (event.code === "NumpadDecimal") {
           secondNumber += ".";
         } else {
-          secondNumber += event.code.slice(6);
-          if (limitInput(secondNumber)) return;
+          if (secondNumber[0] === "0" && event.code !== "NumpadDecimal") {
+            secondNumber = "";
+            secondNumber += event.code.slice(6);
+          } else {
+            secondNumber += event.code.slice(6);
+            if (limitInput(secondNumber)) return;
+          }
         }
       }
 
@@ -316,4 +378,6 @@ window.addEventListener("keydown", function (event) {
   return;
 });
 
+// o menos deve funcionar depois de qualquer operador
 // focus no keyboard on enter fucks it up
+//apagar operador

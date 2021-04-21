@@ -8,34 +8,44 @@
     <title>Calculator</title>
   </head>
   <body>
-    <div id="happenings">
-      <p id="equation">&nbsp</p>
-      <p id="currentInput">&nbsp</p>
+    <div id="title">
+      <h1>Calculator</h1>
     </div>
-    <div id="operators">
-      <button id="add" type="button" name="add">+</button>
-      <button id="subtract" type="button" name="subtract">-</button>
-      <button id="multiply" type="button" name="multiply">x</button>
-      <button id="divide" type="button" name="divide">/</button>
-    </div>
-    <div id="clearsandequals">
-      <button id="equals" type="button" name="equals">=</button>
-      <button id="clear" type="button" name="clear">Clear</button>
-      <button id="backspace" type="button" name="backspace"><-</button>
-    </div>
+    <div id="calculator">
+      <div id="happenings">
+        <p id="equation">&nbsp</p>
+        <p id="currentInput">&nbsp</p>
+      </div>
 
-    <div id="digits">
-      <button id="zero" name="zero" type="button" value="0">0</button>
-      <button id="one" name="one" type="button" value="1">1</button>
-      <button id="two" name="two" type="button" value="2">2</button>
-      <button id="three" name="three" type="button" value="3">3</button>
-      <button id="four" name="four" type="button" value="4">4</button>
-      <button id="five" name="five" type="button" value="5">5</button>
-      <button id="six" name="six" type="button" value="6">6</button>
-      <button id="seven" name="seven" type="button" value="7">7</button>
-      <button id="eight" name="eigth" type="button" value="8">8</button>
-      <button id="nine" name="nine" type="button" value="9">9</button>
-      <button id="dot" name="dot" type="button" value=".">.</button>
+      <div id="operDigits">
+        <div id="digits">
+          <button id="seven" name="seven" type="button" value="7">7</button>
+          <button id="eight" name="eigth" type="button" value="8">8</button>
+          <button id="nine" name="nine" type="button" value="9">9</button>
+          <button id="four" name="four" type="button" value="4">4</button>
+          <button id="five" name="five" type="button" value="5">5</button>
+          <button id="six" name="six" type="button" value="6">6</button>
+          <button id="one" name="one" type="button" value="1">1</button>
+          <button id="two" name="two" type="button" value="2">2</button>
+          <button id="three" name="three" type="button" value="3">3</button>
+          <button id="zero" name="zero" type="button" value="0">0</button>
+          <button id="dot" name="dot" type="button" value=".">.</button>
+          <button id="equals" type="button" name="equals">=</button>
+        </div>
+        <div id="operators">
+          <button id="add" type="button" name="add">+</button>
+          <button id="subtract" type="button" name="subtract">-</button>
+          <button id="multiply" type="button" name="multiply">&#215;</button>
+          <button id="divide" type="button" name="divide">&#247;</button>
+        </div>
+        <div id="clearsandbackspace">
+          <button id="backspace" type="button" name="backspace">&#9003;</button>
+          <button id="clear" type="button" name="clear">
+            C
+            <p id="del">Del</p>
+          </button>
+        </div>
+      </div>
     </div>
     <script src="script.js"></script>
   </body>

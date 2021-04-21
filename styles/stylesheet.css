@@ -1,14 +1,93 @@
+html {
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
 body {
   max-width: 50vw;
+  background-color: #a7b4ff;
+  padding-top: 80px;
   margin: auto;
   font-size: 16px;
   font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter,
     monospace;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+div#title {
+  min-width: 26vw;
+  text-align: left;
 }
 
 button {
   font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter,
     monospace;
+  font-size: 24px;
+  min-height: 100px;
+  min-width: 100px;
+  background-color: #fff2a7;
+  border: none;
+  outline: none;
+  margin: 1px;
+}
+
+button:hover {
+  cursor: pointer;
+  background-color: #ffea74;
+}
+
+p {
+  font-size: 30px;
+}
+
+div#calculator {
+  /* border: 1px solid black; */
+  background-color: #cad2ff;
+}
+
+div#happenings {
+  max-width: 25vw;
+  text-align: right;
+}
+
+p#equation {
+  font-size: 24px;
+}
+div#operDigits {
+  display: flex;
+  flex-direction: row;
+  min-width: 26vw;
+  justify-content: center;
+}
+
+div#digits {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+div#operators {
+  display: flex;
+  flex-direction: column;
+}
+
+div#clearsandbackspace {
+  display: flex;
+  flex-direction: column;
+}
+
+#clear {
+  flex-grow: 1;
+}
+
+#backspace {
+  font-size: 28px;
+}
+
+p#del {
+  font-size: 24px;
 }
 
 /*Hide arrows on input type number*/
