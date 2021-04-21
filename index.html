@@ -3,11 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="styles/stylesheet.css" />
+
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Calculator</title>
   </head>
   <body>
-    <div id="happenings"><p></p></div>
+    <div id="happenings">
+      <p id="equation">&nbsp</p>
+      <p id="currentInput">&nbsp</p>
+    </div>
     <div id="operators">
       <button id="add" type="button" name="add">+</button>
       <button id="subtract" type="button" name="subtract">-</button>
@@ -17,7 +21,7 @@
     <div id="clearsandequals">
       <button id="equals" type="button" name="equals">=</button>
       <button id="clear" type="button" name="clear">Clear</button>
-      <button id="delete" type="button" name="del"><-</button>
+      <button id="backspace" type="button" name="backspace"><-</button>
     </div>
 
     <div id="digits">
