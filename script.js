@@ -1,4 +1,4 @@
-// calculator
+// calculator functions
 function add(a, b) {
   return Math.round((a + b) * 100000) / 100000;
 }
@@ -12,7 +12,7 @@ function multiply(a, b) {
 }
 
 function divide(a, b) {
-  if (b > 0) {
+  if (b != 0) {
     return Math.round((a / b) * 100000) / 100000;
   } else return "ERROR";
 }
@@ -41,362 +41,295 @@ function operate(operator, a, b) {
   } else return "ERROR";
 }
 
-// dom
-
-const digits = document.getElementById("digits");
-const digitsAll = document.querySelectorAll("#digits button");
-const buttonOne = document.getElementById("one");
-const display = document.getElementById("displayInput");
-const equals = document.getElementById("equals");
-const clear = document.getElementById("clear");
+const inputNumber = document.getElementById("inputNumber");
+const digitsAll = document.querySelectorAll(".digits");
 const operatorsAll = document.querySelectorAll("#operators button");
-const operators = document.getElementById("operators");
-const para = document.getElementById("equation");
-const para2 = document.getElementById("currentInput");
-const body = document.querySelector("body");
-const backspace = document.getElementById("backspace");
+const equalsButton = document.getElementById("equals");
+const clearButton = document.getElementById("clear");
+const backspaceButton = document.getElementById("backspace");
 
-// starting values
-let firstNumber = "";
-let secondNumber = "";
+// initial calculator settings
 let operator = "";
-let total = "";
-let subtotal = "";
-let dot = false;
-let currentTextContent;
-para2.textContent = "0";
+let firstNumber;
+let secondNumber;
+let total;
+let subtotal;
+let started = false; // for reseting input from 0 to ""
+let hasOperator = false; // for updating operator if user makes a mistake
 
-//para.textContent = "0";
+// **mouse** listeners
+operatorsAll.forEach((element) =>
+  element.addEventListener("click", function () {
+    getOperator(event, event.target);
+  })
+);
+equalsButton.addEventListener("click", getEquals);
+clearButton.addEventListener("click", clearCalc);
+backspaceButton.addEventListener("click", deleteInput);
+digitsAll.forEach((element) =>
+  element.addEventListener("click", function (event) {
+    getDigits(event, event.target);
+  })
+);
 
-let isoperator = false;
+// **keyboard**
+window.addEventListener("keydown", function (event) {
+  let acceptedKeys = [
+    "Backspace",
+    "Delete",
+    "NumpadEnter",
+    "NumpadAdd",
+    "NumpadSubtract",
+    "NumpadMultiply",
+    "NumpadDivide",
+    "Numpad1",
+    "Numpad2",
+    "Numpad3",
+    "Numpad4",
+    "Numpad5",
+    "Numpad6",
+    "Numpad7",
+    "Numpad8",
+    "Numpad9",
+    "Numpad0",
+    "NumpadDecimal",
+    "Digit0",
+    "Digit1",
+    "Digit2",
+    "Digit3",
+    "Digit4",
+    "Digit5",
+    "Digit6",
+    "Digit7",
+    "Digit8",
+    "Digit9",
+    "Period",
+    "Enter",
+  ];
+  if (acceptedKeys.includes(event.code)) {
+    //backspace
+    if (event.code === "Backspace") {
+      deleteInput(event);
+    }
+    //clear on del
+    if (event.code === "Delete") {
+      clearCalc(event);
+    }
+    // equals
+    if (event.code === "NumpadEnter" || event.code === "Enter") {
+      getEquals(event);
+    }
+    // operators
+    let operatorKeyCodes = [
+      "NumpadAdd",
+      "NumpadSubtract",
+      "NumpadMultiply",
+      "NumpadDivide",
+    ];
+    if (operatorKeyCodes.includes(event.code)) {
+      let target;
+      switch (event.code) {
+        case "NumpadAdd":
+          target = operatorsAll.item(0);
+          break;
+        case "NumpadSubtract":
+          target = operatorsAll.item(1);
+          break;
+        case "NumpadMultiply":
+          target = operatorsAll.item(2);
+          break;
+        case "NumpadDivide":
+          target = operatorsAll.item(3);
+          break;
+      }
+      getOperator(event, target);
+    }
+    // digits
+    let digitKeyCodes = [
+      "Numpad1",
+      "Numpad2",
+      "Numpad3",
+      "Numpad4",
+      "Numpad5",
+      "Numpad6",
+      "Numpad7",
+      "Numpad8",
+      "Numpad9",
+      "Numpad0",
+      "NumpadDecimal",
+      "Digit0",
+      "Digit1",
+      "Digit2",
+      "Digit3",
+      "Digit4",
+      "Digit5",
+      "Digit6",
+      "Digit7",
+      "Digit8",
+      "Digit9",
+      "Period",
+    ];
+    if (digitKeyCodes.includes(event.code)) {
+      let target;
+      let valueCode;
+      if (event.code === "NumpadDecimal" || event.code === "Period") {
+        target = digitsAll.item(10);
+      } else {
+        if (event.code[0] === "D") {
+          valueCode = event.code.slice(5);
+        } else {
+          valueCode = event.code.slice(6);
+        }
+        let index;
+        let digitsArray = Array.from(digitsAll);
+        for (i = 0; i < digitsArray.length; i++) {
+          if (digitsArray[i].value === valueCode) {
+            index = i;
+            break;
+          }
+        }
+        target = digitsAll.item(index);
+      }
+      getDigits(event, target);
+    }
+  } else return;
+});
+
 // event handlers
-function getOperator(event, typeofInput) {
-  if (operator != "" && secondNumber === "") {
+
+function getDigits(event, target) {
+  //if operator has been used, removes styling of operator button
+  hasOperator = false;
+  operatorsAll.forEach((element) => element.classList.remove("activeoperator"));
+  // resets input value if calculator has been used before
+  if (!started && total !== undefined) {
+    clearCalc();
+  }
+  // removes 0 from initial input value
+  if (!started) {
+    resetInput();
+  }
+  // limits number of zeros to 1 at start of number | limits number of digits to 15
+  if (
+    (target.name === "zero" && inputNumber.value === "0") ||
+    inputNumber.value.length > 15
+  ) {
     return;
   }
-  if (operator != "") {
-    let a = Number(firstNumber);
-    let b = Number(secondNumber);
-    subtotal = operate(operator, a, b);
-    if (typeofInput === "mouse") {
-      operator = event.target.name;
+  // adds 0 to decimal number if user starts decimal with . | handles negative numbers and gets number from input
+  //negate only works on click
+  if (inputNumber.value === "" && target.name === "dot") {
+    inputNumber.value = "0.";
+  } else if (target.name === "negate") {
+    if (inputNumber.value === 0 || inputNumber.value === "") {
+      inputNumber.value = 0;
+      started = false;
+      return;
     } else {
-      operator = event.code;
+      if (inputNumber.value !== 0) {
+        let currentInput = Number(inputNumber.value);
+        inputNumber.value = -1 * currentInput;
+      }
     }
-    secondNumber = "";
   } else {
-    if (total != "") {
-      para.textContent = subtotal;
-      total = "";
-    }
-    if (typeofInput === "mouse") {
-      operator = event.target.name;
-    } else {
-      operator = event.code;
-    }
+    inputNumber.value += target.value;
   }
+}
 
-  firstNumber = Number(firstNumber);
-  isoperator = true;
-  switch (operator) {
-    case "add":
-    case "NumpadAdd":
-      if (firstNumber === 0 && subtotal === "") {
-        para.textContent += "0 + ";
-      } else {
-        para.textContent += " + ";
-      }
-      operator = "add";
-      break;
-    case "subtract":
-    case "NumpadSubtract":
-      if (firstNumber === 0 && subtotal === "") {
-        para.textContent += "0 - ";
-      } else {
-        para.textContent += " - ";
-      }
-      operator = "subtract";
-      break;
-    case "multiply":
-    case "NumpadMultiply":
-      if (firstNumber === 0 && subtotal === "") {
-        para.textContent += "0 x ";
-      } else {
-        para.textContent += " x ";
-      }
-      operator = "multiply";
-      break;
-    case "divide":
-    case "NumpadDivide":
-      if (firstNumber === 0 && subtotal === "") {
-        para.textContent += "0 \u00F7 ";
-      } else {
-        para.textContent += " \u00F7 ";
-      }
-      operator = "divide";
-      break;
+function getOperator(event, target) {
+  // checks if operator existed before user clicked on another operator and updates if necessary.
+  if (hasOperator) {
+    operatorsAll.forEach((element) =>
+      element.classList.remove("activeoperator")
+    );
+    operator = target.name;
+    target.classList.add("activeoperator");
+    return;
   }
+  // adds class to operator button for a visual reminder of which operator is in use
+  target.classList.add("activeoperator");
 
-  currentTextContent = para.textContent;
-  dot = false;
+  //first use of calculator
+  if (
+    firstNumber === undefined &&
+    secondNumber === undefined &&
+    subtotal === undefined
+  ) {
+    firstNumber = inputNumber.value;
+    operator = target.name;
+    started = false;
+    hasOperator = true;
+  } // if total was calculated in getEquals function, saves selected operator and resets total
+  else if (total !== undefined) {
+    operator = target.name;
+    started = false;
+    firstNumber = total; // updates number in case backspace was used
+    total = undefined;
+    hasOperator = true;
+  } // calculator with subtotal
+  else {
+    if (subtotal !== undefined) {
+      firstNumber = subtotal;
+    }
+    secondNumber = inputNumber.value;
+    let firstNumberNumber = Number(firstNumber);
+    let secondNumberNumber = Number(secondNumber);
+    subtotal = operate(operator, firstNumberNumber, secondNumberNumber); // uses previous operator
+    firstNumber = subtotal;
+    inputNumber.value = subtotal;
+    operator = target.name; //new operator for next calculation
+    started = false;
+    hasOperator = true;
+  }
+}
+
+function resetInput() {
+  started = true;
+  inputNumber.value = "";
 }
 
 function getEquals(event) {
-  if (firstNumber === "" && secondNumber === "") {
+  // prevents user from getting a result if an operator has not been selected
+  if (operator === "") {
     return;
   }
-  if (secondNumber === "") {
-    secondNumber = firstNumber;
-    let a = Number(firstNumber);
-    let b = Number(secondNumber);
-    total = operate(operator, a, b);
-    para.textContent += secondNumber + " = " + total;
-    para2.textContent = total;
-    subtotal = total;
-    operator = "";
-    firstNumber = "";
-    secondNumber = "";
-  } else {
-    let a = Number(firstNumber);
-    let b = Number(secondNumber);
-    total = operate(operator, a, b);
-    para.textContent += " = " + total;
-    para2.textContent = total;
-    subtotal = total;
-    operator = "";
-    firstNumber = "";
-    secondNumber = "";
-  }
-}
-
-function backspaceCalc(event) {
-  let stop = false;
-  if (total != "") {
-    return;
-  }
-  if (isoperator === true) {
-    operator = "";
-    isoperator = false;
-    if (firstNumber === "") {
-      para2.textContent = "0";
-      para.textContent = "\u00a0";
-    } else {
-      let textContentBeforeOperatorDeletion = para.textContent;
-      /* para.textContent = ""; */
-      para.textContent = textContentBeforeOperatorDeletion.slice(
-        0,
-        textContentBeforeOperatorDeletion.length - 2
-      );
-      stop = true;
-      return;
-    }
-  }
-  if (typeof firstNumber === "string" && operator != "") {
-    let newFirstNumber = firstNumber.slice(0, firstNumber.length - 1);
-    firstNumber = newFirstNumber;
-    if (firstNumber === "") {
-      firstNumber = "";
-      para2.textContent = "0";
-      para.textContent = "\u00a0";
-      stop = true;
-      return;
-    }
-    para.textContent = firstNumber;
-    para2.textContent = firstNumber;
-  } else if (typeof secondNumber === "string" && operator != "") {
-    let textContentBeforeDeletion = para.textContent;
-    let textContentBeforeDeletionInput = para2.textContent;
-    let newSecondNumber = secondNumber.slice(0, secondNumber.length - 1);
-
-    secondNumber = newSecondNumber;
-
-    if (secondNumber === "") {
-      secondNumber = "0";
-      para2.textContent = "0";
-      para.textContent = textContentBeforeDeletion.slice(
-        0,
-        textContentBeforeDeletion.length - 1
-      );
-      para.textContent += "0";
-      stop = true;
-      return;
-    }
-    if (!stop) {
-      para.textContent = textContentBeforeDeletion.slice(
-        0,
-        textContentBeforeDeletion.length - 1
-      );
-      para2.textContent = textContentBeforeDeletionInput.slice(
-        0,
-        textContentBeforeDeletionInput.length - 1
-      );
-    }
-  } else return;
+  // calculates total and updates display
+  let firstNumberNumber = Number(firstNumber);
+  secondNumber = inputNumber.value;
+  let secondNumberNumber = Number(secondNumber);
+  total = operate(operator, firstNumberNumber, secondNumberNumber);
+  subtotal = total;
+  firstNumber = total;
+  inputNumber.value = total;
+  secondNumber = undefined;
+  operator = "";
+  hasOperator = false;
+  started = false;
 }
 
 function clearCalc(event) {
-  firstNumber = "";
-  secondNumber = "";
-  operator = "";
-  total = "";
-  subtotal = "";
-  para.textContent = "\u00a0";
-  para2.textContent = "0";
-  dot = false;
+  firstNumber = undefined;
+  secondNumber = undefined;
+  inputNumber.value = 0;
+  subtotal = undefined;
+  started = false;
+  total = undefined;
+  hasOperator = false;
 }
 
-function limitInput(number) {
-  if (number.length > 20) {
-    return true;
+// lets user make changes to current number before calculation
+function deleteInput(event) {
+  let currentInput = inputNumber.value;
+  let deleteCharac = currentInput.slice(0, currentInput.length - 1);
+  inputNumber.value = deleteCharac;
+  if (total !== undefined) {
+    total = deleteCharac;
+    subtotal = deleteCharac;
+  }
+  if (total === undefined && subtotal !== undefined) {
+    subtotal = deleteCharac;
   }
 }
-// event listeners
 
-//mouse
-digitsAll.forEach((element) =>
-  element.addEventListener("click", function () {
-    if (event.target.name === "dot") {
-      if (dot) {
-        return;
-      } else {
-        dot = true;
-      }
-    }
-
-    if (operator === "") {
-      if (firstNumber === "0" && event.target.name === "zero") {
-        return;
-      } else if (firstNumber === "" && event.target.name === "dot") {
-        firstNumber = "0.";
-      } else {
-        if (firstNumber[0] === "0" && event.target.value !== "dot") {
-          firstNumber = "";
-          firstNumber += event.target.value;
-        } else {
-          firstNumber += event.target.value;
-          if (limitInput(firstNumber)) return;
-        }
-      }
-      subtotal = "";
-      para.textContent = "";
-      para.textContent += firstNumber;
-      para2.textContent = para.textContent;
-    } else {
-      if (subtotal != "") {
-        firstNumber = subtotal;
-      }
-      if (secondNumber === "0" && event.target.name === "zero") {
-        return;
-      } else if (secondNumber === "" && event.target.name === "dot") {
-        secondNumber = "0.";
-      } else {
-        if (secondNumber[0] === "0" && event.target.value !== "dot") {
-          secondNumber = "";
-          secondNumber += event.target.value;
-        } else {
-          secondNumber += event.target.value;
-          if (limitInput(secondNumber)) return;
-        }
-      }
-
-      para.textContent = currentTextContent + secondNumber;
-      para2.textContent = secondNumber;
-    }
-  })
-);
-//sera que posso juntar os returns todos?
-
-equals.addEventListener("click", getEquals);
-clear.addEventListener("click", clearCalc);
-backspace.addEventListener("click", backspaceCalc);
-operatorsAll.forEach((element) =>
-  element.addEventListener("click", function () {
-    getOperator(event, "mouse");
-  })
-);
-
-// keyboard
-window.addEventListener("keydown", function (event) {
-  //backspace
-  if (event.keyCode === 8) {
-    backspaceCalc(event);
-  }
-  //clear on del
-  if (event.keyCode === 46) {
-    clearCalc(event);
-  }
-  //equals
-  if (event.keyCode === 13) {
-    getEquals(event);
-  }
-  // operators
-  let operatorKeyCodes = [107, 109, 106, 111];
-  if (operatorKeyCodes.includes(event.keyCode)) {
-    getOperator(event, "keyboard");
-  }
-  //digits
-  if (event.code === "NumpadDecimal") {
-    if (dot) {
-      return;
-    } else {
-      dot = true;
-    }
-  }
-  let digitKeyCodes = [96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 110];
-  if (digitKeyCodes.includes(event.keyCode)) {
-    isoperator = false;
-    if (operator === "") {
-      if (firstNumber === "0" && event.code === "Numpad0") {
-        return;
-      } else if (firstNumber === "" && event.code === "NumpadDecimal") {
-        firstNumber = "0.";
-      } else {
-        if (event.code === "NumpadDecimal") {
-          firstNumber += ".";
-        } else {
-          if (firstNumber[0] === "0" && event.code !== "NumpadDecimal") {
-            firstNumber = "";
-            firstNumber += event.code.slice(6);
-          } else {
-            firstNumber += event.code.slice(6);
-            if (limitInput(firstNumber)) return;
-          }
-        }
-      }
-      subtotal = "";
-      para.textContent = "";
-      para.textContent += firstNumber;
-      para2.textContent = para.textContent;
-    } else {
-      if (subtotal != "") {
-        firstNumber = subtotal;
-      }
-      if (secondNumber === "0" && event.code === "Numpad0") {
-        return;
-      } else if (secondNumber === "" && event.code === "NumpadDecimal") {
-        secondNumber = "0.";
-      } else {
-        if (event.code === "NumpadDecimal") {
-          secondNumber += ".";
-        } else {
-          if (secondNumber[0] === "0" && event.code !== "NumpadDecimal") {
-            secondNumber = "";
-            secondNumber += event.code.slice(6);
-          } else {
-            secondNumber += event.code.slice(6);
-            if (limitInput(secondNumber)) return;
-          }
-        }
-      }
-
-      para.textContent = currentTextContent + secondNumber;
-      para2.textContent = secondNumber;
-    }
-  }
-
-  return;
-});
-
-// o menos deve funcionar depois de qualquer operador
-// focus no keyboard on enter fucks it up
-// os 0 nao estao a funcionar. quando meto o ., apaga o zero
+// // o menos deve funcionar depois de qualquer operador
+// // focus no keyboard on enter fucks it up
