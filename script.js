@@ -47,6 +47,7 @@ const operatorsAll = document.querySelectorAll("#operators button");
 const equalsButton = document.getElementById("equals");
 const clearButton = document.getElementById("clear");
 const backspaceButton = document.getElementById("backspace");
+const buttonsAll = document.querySelectorAll("button");
 
 // initial calculator settings
 let operator = "";
@@ -74,14 +75,46 @@ digitsAll.forEach((element) =>
 
 // **keyboard**
 window.addEventListener("keydown", function (event) {
-  let acceptedKeys = [
-    "Backspace",
-    "Delete",
-    "NumpadEnter",
+  buttonsAll.forEach((element) => element.blur()); //when user switches to keyboard, removes focus from buttons
+  //backspace
+  if (event.code === "Backspace") {
+    deleteInput(event);
+  }
+  //clear on del
+  if (event.code === "Delete") {
+    clearCalc(event);
+  }
+  // equals
+  if (event.code === "NumpadEnter" || event.code === "Enter") {
+    getEquals(event);
+  }
+  // operators
+  let operatorKeyCodes = [
     "NumpadAdd",
     "NumpadSubtract",
     "NumpadMultiply",
     "NumpadDivide",
+  ];
+  if (operatorKeyCodes.includes(event.code)) {
+    let target;
+    switch (event.code) {
+      case "NumpadAdd":
+        target = operatorsAll.item(0);
+        break;
+      case "NumpadSubtract":
+        target = operatorsAll.item(1);
+        break;
+      case "NumpadMultiply":
+        target = operatorsAll.item(2);
+        break;
+      case "NumpadDivide":
+        target = operatorsAll.item(3);
+        break;
+    }
+    getOperator(event, target);
+  }
+  // digits
+  let digitKeyCodes = [
     "Numpad1",
     "Numpad2",
     "Numpad3",
@@ -104,95 +137,31 @@ window.addEventListener("keydown", function (event) {
     "Digit8",
     "Digit9",
     "Period",
-    "Enter",
   ];
-  if (acceptedKeys.includes(event.code)) {
-    //backspace
-    if (event.code === "Backspace") {
-      deleteInput(event);
-    }
-    //clear on del
-    if (event.code === "Delete") {
-      clearCalc(event);
-    }
-    // equals
-    if (event.code === "NumpadEnter" || event.code === "Enter") {
-      getEquals(event);
-    }
-    // operators
-    let operatorKeyCodes = [
-      "NumpadAdd",
-      "NumpadSubtract",
-      "NumpadMultiply",
-      "NumpadDivide",
-    ];
-    if (operatorKeyCodes.includes(event.code)) {
-      let target;
-      switch (event.code) {
-        case "NumpadAdd":
-          target = operatorsAll.item(0);
-          break;
-        case "NumpadSubtract":
-          target = operatorsAll.item(1);
-          break;
-        case "NumpadMultiply":
-          target = operatorsAll.item(2);
-          break;
-        case "NumpadDivide":
-          target = operatorsAll.item(3);
-          break;
-      }
-      getOperator(event, target);
-    }
-    // digits
-    let digitKeyCodes = [
-      "Numpad1",
-      "Numpad2",
-      "Numpad3",
-      "Numpad4",
-      "Numpad5",
-      "Numpad6",
-      "Numpad7",
-      "Numpad8",
-      "Numpad9",
-      "Numpad0",
-      "NumpadDecimal",
-      "Digit0",
-      "Digit1",
-      "Digit2",
-      "Digit3",
-      "Digit4",
-      "Digit5",
-      "Digit6",
-      "Digit7",
-      "Digit8",
-      "Digit9",
-      "Period",
-    ];
-    if (digitKeyCodes.includes(event.code)) {
-      let target;
-      let valueCode;
-      if (event.code === "NumpadDecimal" || event.code === "Period") {
-        target = digitsAll.item(10);
+  if (digitKeyCodes.includes(event.code)) {
+    let target;
+    let valueCode;
+    if (event.code === "NumpadDecimal" || event.code === "Period") {
+      target = digitsAll.item(10);
+    } else {
+      if (event.code[0] === "D") {
+        valueCode = event.code.slice(5);
       } else {
-        if (event.code[0] === "D") {
-          valueCode = event.code.slice(5);
-        } else {
-          valueCode = event.code.slice(6);
-        }
-        let index;
-        let digitsArray = Array.from(digitsAll);
-        for (i = 0; i < digitsArray.length; i++) {
-          if (digitsArray[i].value === valueCode) {
-            index = i;
-            break;
-          }
-        }
-        target = digitsAll.item(index);
+        valueCode = event.code.slice(6);
       }
-      getDigits(event, target);
+      let index;
+      let digitsArray = Array.from(digitsAll);
+      for (i = 0; i < digitsArray.length; i++) {
+        if (digitsArray[i].value === valueCode) {
+          index = i;
+          break;
+        }
+      }
+      target = digitsAll.item(index);
     }
-  } else return;
+    getDigits(event, target);
+  }
+  /* }  else*/ return;
 });
 
 // event handlers

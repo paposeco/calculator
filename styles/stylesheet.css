@@ -9,12 +9,11 @@ html {
 }
 
 body {
-  max-width: 50vw;
+  width: 440px;
   background-color: #a7b4ff;
   margin: auto;
   font-size: 16px;
-  font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter,
-    monospace;
+  font-family: Consolas, monaco, monospace;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -22,13 +21,12 @@ body {
 }
 
 div#title {
-  min-width: 25vw;
+  width: 440px;
   text-align: right;
 }
 
 input {
-  font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter,
-    monospace;
+  font-family: Consolas, monaco, monospace;
   width: 90%;
   height: 100%;
   text-align: right;
@@ -42,11 +40,10 @@ input {
 }
 
 button {
-  font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter,
-    monospace;
-  font-size: 26px;
-  min-height: 85px;
-  min-width: 85px;
+  font-family: Consolas, monaco, monospace;
+  font-size: 28px;
+  height: 75px;
+  width: 75px;
   background-color: #fff2a7;
   border-radius: 50px;
   border: 1px solid #ffea74;
@@ -62,10 +59,6 @@ button:hover {
   box-shadow: inset 1px 1px 2px 1px #fff2a7, 1px 1px 2px 1px #ffe75b;
 }
 
-button:focus {
-  /* border: 3px dotted #a7b4ff; */
-}
-
 .activeoperator {
   border: 3px dotted #a7b4ff;
   box-shadow: none;
@@ -76,14 +69,14 @@ p {
 }
 
 div#calculator {
+  width: 440px;
   border: 5px solid #96a2e5;
   background-color: #cad2ff;
   border-radius: 10px;
-  /* padding: 5px; */
 }
 
 div#happenings {
-  min-width: 22vw;
+  width: 380px;
   height: 120px;
   padding: 10px 30px;
 }
@@ -95,7 +88,6 @@ div#operDigits {
   padding-top: 20px;
   display: flex;
   flex-direction: row;
-  min-width: 22vw;
   justify-content: center;
   padding-bottom: 20px;
 }
@@ -115,10 +107,6 @@ div#clearsandbackspace {
   flex-direction: column;
 }
 
-#clear {
-  /* flex-grow: 1; */
-}
-
 #equals {
   flex-grow: 1;
 }
@@ -134,4 +122,24 @@ div#clearsandbackspace {
   border: 1px solid #96a2e5;
   margin-top: 8px;
   border-radius: 2px;
+}
+
+@media screen and (max-width: 415px) {
+  body {
+    width: 95%;
+  }
+  div#calculator {
+    width: 95%;
+  }
+  div#happenings {
+    width: 85%;
+    padding: 10px 25px;
+  }
+  div#title {
+    width: 95%;
+  }
+  button {
+    width: 60px;
+    height: 60px;
+  }
 }
