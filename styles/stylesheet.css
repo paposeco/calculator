@@ -124,6 +124,19 @@ div#clearsandbackspace {
   border-radius: 2px;
 }
 
+#credits p {
+  font-size: 16px;
+}
+
+#credits a {
+  color: #f4d74a;
+  text-decoration: none;
+}
+
+#credits a:visited {
+  color: #32364c;
+}
+
 @media screen and (max-width: 415px) {
   body {
     width: 95%;
