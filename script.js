@@ -161,7 +161,7 @@ window.addEventListener("keydown", function (event) {
     }
     getDigits(event, target);
   }
-  /* }  else*/ return;
+  return;
 });
 
 // event handlers
@@ -181,6 +181,7 @@ function getDigits(event, target) {
   // limits number of zeros to 1 at start of number | limits number of digits to 15
   if (
     (target.name === "zero" && inputNumber.value === "0") ||
+    (inputNumber.value.includes(".") && target.name === "dot") ||
     inputNumber.value.length > 15
   ) {
     return;

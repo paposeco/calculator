@@ -137,6 +137,19 @@ div#clearsandbackspace {
   color: #32364c;
 }
 
+/*Hide arrows on input type number*/
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 @media screen and (max-width: 415px) {
   body {
     width: 95%;
