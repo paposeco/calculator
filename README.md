@@ -1,6 +1,8 @@
 # Calculator implementation for the Odin Project
 
 [Live Demo](https://paposeco.github.io/calculator/)
+![Calculator](https://github.com/paposeco/calculator/assets/13892562/da145d2e-359e-4b97-b68f-f3cd9623b4a4)
+
 
 This is a simplified calculator that only operates on two operands at a time.
 
